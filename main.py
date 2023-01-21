@@ -1,5 +1,6 @@
 from cgitb import text
 from datetime import datetime
+from typing import Optional
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -65,8 +66,9 @@ class Blog(BaseModel):
     title: str
     date: datetime
     body: str
+    published: Optional[bool]
 
 ## set url for creating a blog post
 @app.post('/blog/create-post')
 def create_post(post: Blog):
-    return {'data': post}
+    return {'data': f'Blog is created with title {post.title}'}
