@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import FastAPI, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 
@@ -31,7 +32,7 @@ def createBlog(request: schemas.Blog, db: Session = Depends(get_db)):
     return new_blog
 
 
-@app.get('/blog')
+@app.get('/blog', response_model=List[schemas.ShowBlog])
 def getAllBlogPost(db: Session = Depends(get_db)):
     """
     List all blog post
@@ -39,13 +40,13 @@ def getAllBlogPost(db: Session = Depends(get_db)):
     all_posts = db.query(models.Blog).all()
     return all_posts
 
-@app.get('/blog/{id}')
-def getIndividualPost(id,db: Session = Depends(get_db)):
+@app.get('/blog/{id}', response_model=schemas.ShowBlog)
+def getIndividualPost(id, db: Session = Depends(get_db)):
     """
     Retrive individual post with a specific id
     """
-    blog = db.query(models.Blog).filter(models.Blog.id == id)
-    if not blog.first():
+    blog = db.query(models.Blog).filter(models.Blog.id == id).first()
+    if not blog:
         raise HTTPException(status_code=404, detail="Blog post with the {'title'} not available")
     return blog
 
@@ -57,9 +58,9 @@ def deletePost(id, db: Session = Depends(get_db)):
     id: int
     db: db session
     """
-    blog_post = db.query(models.Blog).filter(models.Blog.id == id)
+    blog_post = db.query(models.Blog).filter(models.Blog.id == id).first()
 
-    if not blog_post.first():
+    if not blog_post:
         raise HTTPException(status_code=404, detail="Blog post with the {'title'} not available")
     
     blog_post.delete(synchronize_session=False)
@@ -74,8 +75,8 @@ def updatePost(id, request: schemas.Blog, db: Session = Depends(get_db)):
 
     id: int
     """
-    blog = db.query(models.Blog).filter(models.Blog.id == id)
-    if not blog.first():
+    blog = db.query(models.Blog).filter(models.Blog.id == id).first()
+    if not blog:
         raise HTTPException(status_code=404, detail="Blog post with the {'title'} not available")
     
     blog.update(request, synchronize_session=False)
