@@ -1,4 +1,5 @@
 from typing import List
+from urllib import request
 from fastapi import FastAPI, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 
@@ -83,3 +84,16 @@ def updatePost(id, request: schemas.Blog, db: Session = Depends(get_db)):
     db.commit()
 
     return f"Blog post with the {'Title'} Updated."
+
+
+@app.put('/user')
+def createUser(request: schemas.User, db: Session = Depends(get_db)):
+    """
+    Creating a User 
+    """
+    
+    new_user = models.User(name=request.name, email=request.email, password=request.password)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
