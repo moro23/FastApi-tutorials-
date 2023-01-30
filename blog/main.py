@@ -3,11 +3,11 @@ from urllib import request
 from fastapi import FastAPI, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 
-from . import  models, schemas
+from . import  models, schemas, hashing
 from .database import  SessionLocal, engine
 
 ## migrating the tables in the db 
-models.Base.metadata.create_all(bind=engine)
+models.Base.metadata.create_all(bind=engine) 
 
 ## creating an instance of FastAPI
 app = FastAPI()
@@ -51,7 +51,7 @@ def getIndividualPost(id, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Blog post with the {'title'} not available")
     return blog
 
-@app.delete('/blog/{id}', status_code=status.HTTP_204_NO_CONTENT)
+@app.delete('/blog/{id}',status_code=status.HTTP_204_NO_CONTENT)
 def deletePost(id, db: Session = Depends(get_db)):
     """
     Deleting a blog post with a specific id
@@ -86,13 +86,15 @@ def updatePost(id, request: schemas.Blog, db: Session = Depends(get_db)):
     return f"Blog post with the {'Title'} Updated."
 
 
-@app.put('/user')
+
+@app.post('/user')
 def createUser(request: schemas.User, db: Session = Depends(get_db)):
     """
     Creating a User 
     """
-    
-    new_user = models.User(name=request.name, email=request.email, password=request.password)
+    ## lets hash the password coming from the user
+    hashed_password = pwd_context.hash(request.password)
+    new_user = models.User(name=request.name, email=request.email, password=hashing.Hash.bcrypt(request.password))
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
