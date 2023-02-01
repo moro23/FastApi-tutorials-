@@ -26,7 +26,7 @@ def createBlog(request: schemas.Blog, db: Session = Depends(get_db)):
     """
     Creating blog post
     """
-    new_blog = models.Blog(title=request.title, body=request.body)
+    new_blog = models.Blog(title=request.title, body=request.body, user_id=1)
     db.add(new_blog)
     db.commit()
     db.refresh(new_blog)
