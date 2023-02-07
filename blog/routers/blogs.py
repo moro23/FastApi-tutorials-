@@ -6,9 +6,12 @@ from sqlalchemy.orm import Session
 
 from .. import schemas, models, database
  
-router = APIRouter()
+router = APIRouter(
+    prefix="/blog",
+    tags=['Blogs']
+)
 
-@router.get('/blog', response_model=List[schemas.ShowBlog], tags=['blogs'])
+@router.get('/', response_model=List[schemas.ShowBlog])
 def getAllBlogPost(db: Session = Depends(database.get_db)):
     """
     List all blog post
@@ -16,7 +19,7 @@ def getAllBlogPost(db: Session = Depends(database.get_db)):
     all_posts = db.query(models.Blog).all()
     return all_posts
 
-@router.post('/blog', status_code=status.HTTP_201_CREATED, tags=['blogs'])
+@router.post('/', status_code=status.HTTP_201_CREATED)
 def createBlog(request: schemas.Blog, db: Session = Depends(database.get_db)):
     """
     Creating blog post
@@ -27,7 +30,7 @@ def createBlog(request: schemas.Blog, db: Session = Depends(database.get_db)):
     db.refresh(new_blog)
     return new_blog
 
-@router.get('/blog/{id}', response_model=schemas.ShowBlog, tags=['blogs'])
+@router.get('/{id}', response_model=schemas.ShowBlog)
 def getIndividualPost(id, db: Session = Depends(database.get_db)):
     """
     Retrive individual post with a specific id
@@ -37,7 +40,7 @@ def getIndividualPost(id, db: Session = Depends(database.get_db)):
         raise HTTPException(status_code=404, detail="Blog post with the {'title'} not available")
     return blog
 
-@router.delete('/blog/{id}',status_code=status.HTTP_204_NO_CONTENT, tags=['blogs'])
+@router.delete('/{id}',status_code=status.HTTP_204_NO_CONTENT)
 def deletePost(id, db: Session = Depends(database.get_db)):
     """
     Deleting a blog post with a specific id
@@ -55,7 +58,7 @@ def deletePost(id, db: Session = Depends(database.get_db)):
 
     return f"Blog post with the {'Title'} Deleted."
 
-@router.put('/blog/{id}', status_code=status.HTTP_202_ACCEPTED, tags=['blogs'])
+@router.put('/{id}', status_code=status.HTTP_202_ACCEPTED)
 def updatePost(id, request: schemas.Blog, db: Session = Depends(database.get_db)):
     """
     Updating a blog post with a specific id
