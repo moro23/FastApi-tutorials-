@@ -6,6 +6,7 @@ from .database import  engine
 
 from .routers import blogs, users, authentication
 
+
 ## migrating the tables in the db 
 models.Base.metadata.create_all(bind=engine) 
 

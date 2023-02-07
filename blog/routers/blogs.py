@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 
 
 from .. import schemas, models, database
+
+from ..oauth import get_current_user
  
 router = APIRouter(
     prefix="/blog",
@@ -12,7 +14,7 @@ router = APIRouter(
 )
 
 @router.get('/', response_model=List[schemas.ShowBlog])
-def getAllBlogPost(db: Session = Depends(database.get_db)):
+def getAllBlogPost(db: Session = Depends(database.get_db), get_current_user: schemas.User = Depends(get_current_user) ):
     """
     List all blog post
     """
