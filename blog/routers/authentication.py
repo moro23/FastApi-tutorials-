@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
 from .. import schemas, database, models
 
 from ..hashing import Hash
 
-from sqlalchemy.orm import Session
+from . import jwt_tokens
 
 router = APIRouter(
     tags=['Login']
@@ -20,5 +21,7 @@ def login(request: schemas.Login, db: Session = Depends(database.get_db)):
     if not Hash.verify(user.password, request.password):
         raise HTTPException(status_code=404, detail=f"Credentials does not match?")
     
-    ## generate a jwt token
-    return user
+    ## generate a jwt access token
+    access_token = jwt_tokens.create_access_token(data={"sub": user.email})
+    return {"access_token": access_token, "token_type": "bearer"}
+    #return user

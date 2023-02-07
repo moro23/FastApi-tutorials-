@@ -29,7 +29,6 @@ class ShowBlog(BaseModel):
     body: str
     #creator: ShowUser
 
-
     class Config():
         orm_mode = True
     
@@ -39,3 +38,11 @@ class Login(BaseModel):
 
     class Config():
         orm_mode = True
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str | None = None
