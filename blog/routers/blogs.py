@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 
 
@@ -14,7 +14,7 @@ router = APIRouter(
 )
 
 @router.get('/', response_model=List[schemas.ShowBlog])
-def getAllBlogPost(db: Session = Depends(database.get_db), get_current_user: schemas.User = Depends(get_current_user) ):
+def getAllBlogPost(db: Session = Depends(database.get_db), current_user: schemas.User = Depends(get_current_user) ):
     """
     List all blog post
     """
@@ -22,7 +22,7 @@ def getAllBlogPost(db: Session = Depends(database.get_db), get_current_user: sch
     return all_posts
 
 @router.post('/', status_code=status.HTTP_201_CREATED)
-def createBlog(request: schemas.Blog, db: Session = Depends(database.get_db)):
+def createBlog(request: schemas.Blog, db: Session = Depends(database.get_db), current_user: schemas.User = Depends(get_current_user)):
     """
     Creating blog post
     """
@@ -33,7 +33,7 @@ def createBlog(request: schemas.Blog, db: Session = Depends(database.get_db)):
     return new_blog
 
 @router.get('/{id}', response_model=schemas.ShowBlog)
-def getIndividualPost(id, db: Session = Depends(database.get_db)):
+def getIndividualPost(id, db: Session = Depends(database.get_db), current_user: schemas.User = Depends(get_current_user)):
     """
     Retrive individual post with a specific id
     """
@@ -43,7 +43,7 @@ def getIndividualPost(id, db: Session = Depends(database.get_db)):
     return blog
 
 @router.delete('/{id}',status_code=status.HTTP_204_NO_CONTENT)
-def deletePost(id, db: Session = Depends(database.get_db)):
+def deletePost(id, db: Session = Depends(database.get_db), current_user: schemas.User = Depends(get_current_user)):
     """
     Deleting a blog post with a specific id
 
@@ -61,7 +61,7 @@ def deletePost(id, db: Session = Depends(database.get_db)):
     return f"Blog post with the {'Title'} Deleted."
 
 @router.put('/{id}', status_code=status.HTTP_202_ACCEPTED)
-def updatePost(id, request: schemas.Blog, db: Session = Depends(database.get_db)):
+def updatePost(id, request: schemas.Blog, db: Session = Depends(database.get_db), current_user: schemas.User = Depends(get_current_user)):
     """
     Updating a blog post with a specific id
 
